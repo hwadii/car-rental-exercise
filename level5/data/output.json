@@ -1,0 +1,37 @@
+{
+  "rentals": [
+    {
+      "id": 1,
+      "options": ["gps", "baby_seat"],
+      "actions": [
+        { "who": "driver", "type": "debit", "amount": 3000 },
+        { "who": "owner", "type": "credit", "amount": 2100.0 },
+        { "who": "assistance", "type": "credit", "amount": 100 },
+        { "who": "drivy", "type": "credit", "amount": 350.0 },
+        { "who": "insurance", "type": "credit", "amount": 450.0 }
+      ]
+    },
+    {
+      "id": 2,
+      "options": ["additional_insurance"],
+      "actions": [
+        { "who": "driver", "type": "debit", "amount": 6800.0 },
+        { "who": "owner", "type": "credit", "amount": 4760.0 },
+        { "who": "assistance", "type": "credit", "amount": 200 },
+        { "who": "drivy", "type": "credit", "amount": 820.0 },
+        { "who": "insurance", "type": "credit", "amount": 1020.0 }
+      ]
+    },
+    {
+      "id": 3,
+      "options": [],
+      "actions": [
+        { "who": "driver", "type": "debit", "amount": 27800.0 },
+        { "who": "owner", "type": "credit", "amount": 19460.0 },
+        { "who": "assistance", "type": "credit", "amount": 1200 },
+        { "who": "drivy", "type": "credit", "amount": 2970.0 },
+        { "who": "insurance", "type": "credit", "amount": 4170.0 }
+      ]
+    }
+  ]
+}
