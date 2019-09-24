@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-import unittest
 
 with open('data/input.json') as f:
     read_data = json.load(f)
