@@ -6,11 +6,6 @@ with open('data/input.json') as f:
     read_data = json.load(f)
 
 
-class Tests(unittest.TestCase):
-    def test_prices(self, id):
-        self.assertEqual()
-
-
 class Car:
     def __init__(self, id, price_per_day, price_per_km):
         self.id = id

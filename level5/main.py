@@ -60,7 +60,7 @@ class Drivy:
 
 
 class Driver:
-    def __init__(self, id):
+    def __init__(self, id, options):
         self.id = id
         self.car_id = read_data["rentals"][id - 1]["car_id"]
         self.car = Car(self.car_id, read_data["cars"][self.car_id - 1]
@@ -97,7 +97,7 @@ class Driver:
         return self.distance * self.car.price_per_km
 
     def get_total(self):
-        return self.get_distance_component() + self.get_time_component()
+        return self.get_distance_component() + self.get_time_component() + sum([Option(option, self.get_rental_days()).get_option_fee() for option in self.options])
 
     def get_action(self):
         return {
@@ -114,11 +114,12 @@ class Option:
 
     def get_option_fee(self):
         options = {
-            "gps": 5 * self.days,
-            "baby_seat": 2 * self.days,
-            "additionnal_insurance": 10 * self.days
+            "gps": 500 * self.days,
+            "baby_seat": 200 * self.days,
+            "additional_insurance": 1000 * self.days
         }
         return options[self.option]
+
 
 data = {}
 data["rentals"] = []

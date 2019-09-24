@@ -4,22 +4,22 @@
       "id": 1,
       "options": ["gps", "baby_seat"],
       "actions": [
-        { "who": "driver", "type": "debit", "amount": 3000 },
-        { "who": "owner", "type": "credit", "amount": 2100.0 },
+        { "who": "driver", "type": "debit", "amount": 3700 },
+        { "who": "owner", "type": "credit", "amount": 2590.0 },
         { "who": "assistance", "type": "credit", "amount": 100 },
-        { "who": "drivy", "type": "credit", "amount": 350.0 },
-        { "who": "insurance", "type": "credit", "amount": 450.0 }
+        { "who": "drivy", "type": "credit", "amount": 455.0 },
+        { "who": "insurance", "type": "credit", "amount": 555.0 }
       ]
     },
     {
       "id": 2,
       "options": ["additional_insurance"],
       "actions": [
-        { "who": "driver", "type": "debit", "amount": 6800.0 },
-        { "who": "owner", "type": "credit", "amount": 4760.0 },
+        { "who": "driver", "type": "debit", "amount": 8800.0 },
+        { "who": "owner", "type": "credit", "amount": 6160.0 },
         { "who": "assistance", "type": "credit", "amount": 200 },
-        { "who": "drivy", "type": "credit", "amount": 820.0 },
-        { "who": "insurance", "type": "credit", "amount": 1020.0 }
+        { "who": "drivy", "type": "credit", "amount": 1120.0 },
+        { "who": "insurance", "type": "credit", "amount": 1320.0 }
       ]
     },
     {
