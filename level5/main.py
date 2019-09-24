@@ -12,27 +12,40 @@ class Car:
         self.price_per_day = price_per_day
         self.price_per_km = price_per_km
 
-
-class CarOwner:
-    def __init__(self, car_id, total, options):
-        self.car_id = car_id
-        self.commission = total * (70 / 100)
+class Actor:
+    def __init__(self, total, days, options):
         self.options = options
+        self.days = days
 
-    def get_action(self):
+    def get_actions(self):
+        raise NotImplementedError("Implement this method")
+
+    def get_options(self):
+        if self.options == []:
+            return 0
+        else:
+            return sum([Option(option, self.days).get_option_fee() for option in self.own_options if option in self.options])
+
+class CarOwner(Actor):
+    def __init__(self, total, days, options):
+        super().__init__(total, days, options)
+        self.commission = total * (70 / 100)
+        self.own_options = ["gps", "baby_seat"]
+
+    def get_actions(self):
         return {
             "who": "owner",
             "type": "credit",
-            "amount": self.commission
+            "amount": self.commission + self.get_options()
         }
 
 
-class Drivy:
+
+class Drivy(Actor):
     def __init__(self, total, days, options):
-        self.total = total
+        super().__init__(total, days, options)
         self.commission = total * (30 / 100)
-        self.days = days
-        self.options = options
+        self.own_options = ["additional_insurance"]
 
     def get_insurance_fee(self):
         return {
@@ -52,14 +65,14 @@ class Drivy:
         return {
             "who": "drivy",
             "type": "credit",
-            "amount": self.commission - self.get_assistance_fee()["amount"] - self.get_insurance_fee()["amount"]
+            "amount": self.commission + self.get_options() - self.get_assistance_fee()["amount"] - self.get_insurance_fee()["amount"]
         }
 
     def get_actions(self):
-        return [self.get_assistance_fee(), self.get_drivy_fee(), self.get_insurance_fee()]
+        return [self.get_insurance_fee(), self.get_assistance_fee(), self.get_drivy_fee()]
 
 
-class Driver:
+class Driver(Actor):
     def __init__(self, id, options):
         self.id = id
         self.car_id = read_data["rentals"][id - 1]["car_id"]
@@ -96,14 +109,17 @@ class Driver:
     def get_distance_component(self):
         return self.distance * self.car.price_per_km
 
-    def get_total(self):
+    def get_total_options(self):
         return self.get_distance_component() + self.get_time_component() + sum([Option(option, self.get_rental_days()).get_option_fee() for option in self.options])
 
-    def get_action(self):
+    def get_total_no_options(self):
+        return self.get_distance_component() + self.get_time_component()
+
+    def get_actions(self):
         return {
             "who": "driver",
             "type": "debit",
-            "amount": self.get_total()
+            "amount": self.get_total_options()
         }
 
 
@@ -127,13 +143,15 @@ for d in read_data["rentals"]:
     options = [option["type"] for option in read_data["options"]
                if option["rental_id"] == d["id"]]
     driver = Driver(d["id"], options)
-    drivy = Drivy(driver.get_total(), driver.get_rental_days(), options)
-    carOwner = CarOwner(d["id"], driver.get_total(), options)
+    drivy = Drivy(driver.get_total_no_options(),
+                  driver.get_rental_days(), options)
+    car_owner = CarOwner(driver.get_total_no_options(),
+                         driver.get_rental_days(), options)
     data["rentals"].append({
         "id": driver.id,
         "options": options,
-        "actions": [driver.get_action(), carOwner.get_action(), *drivy.get_actions()]
+        "actions": [driver.get_actions(), car_owner.get_actions(), *drivy.get_actions()]
     })
 
 with open('data/output.json', 'w') as out:
-    json.dump(data, out)
+    json.dump(data, out, indent=2)
