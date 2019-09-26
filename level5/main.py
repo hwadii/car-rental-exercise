@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-# changer ça
 with open('data/input.json') as f:
     read_data = json.load(f)
 
@@ -11,6 +10,7 @@ class Car:
         self.id = id
         self.price_per_day = price_per_day
         self.price_per_km = price_per_km
+
 
 class Actor:
     def __init__(self, total, days, options):
@@ -26,6 +26,7 @@ class Actor:
         else:
             return sum([Option(option, self.days).get_option_fee() for option in self.own_options if option in self.options])
 
+
 class CarOwner(Actor):
     def __init__(self, total, days, options):
         super().__init__(total, days, options)
@@ -38,7 +39,6 @@ class CarOwner(Actor):
             "type": "credit",
             "amount": self.commission + self.get_options()
         }
-
 
 
 class Drivy(Actor):
@@ -82,14 +82,13 @@ class Driver(Actor):
             read_data["rentals"][id - 1]["start_date"], "%Y-%m-%d")
         self.end_date = datetime.strptime(
             read_data["rentals"][id - 1]["end_date"], "%Y-%m-%d")
+        self.rental_days = (self.end_date - self.start_date).days + 1
         self.distance = read_data["rentals"][id - 1]["distance"]
         self.options = options
 
-    def get_rental_days(self):
-        return (self.end_date - self.start_date).days + 1
 
     def get_time_component(self):
-        rental_days = self.get_rental_days()
+        rental_days = self.rental_days
         decreasing_price = 0
         while rental_days > 0:
             if rental_days > 10:
@@ -110,7 +109,7 @@ class Driver(Actor):
         return self.distance * self.car.price_per_km
 
     def get_total_options(self):
-        return self.get_distance_component() + self.get_time_component() + sum([Option(option, self.get_rental_days()).get_option_fee() for option in self.options])
+        return self.get_distance_component() + self.get_time_component() + sum([Option(option, self.rental_days).get_option_fee() for option in self.options])
 
     def get_total_no_options(self):
         return self.get_distance_component() + self.get_time_component()
@@ -137,21 +136,21 @@ class Option:
         return options[self.option]
 
 
-data = {}
-data["rentals"] = []
-for d in read_data["rentals"]:
+result = {}
+result["rentals"] = []
+for data in read_data["rentals"]:
     options = [option["type"] for option in read_data["options"]
-               if option["rental_id"] == d["id"]]
-    driver = Driver(d["id"], options)
+               if option["rental_id"] == data["id"]]
+    driver = Driver(data["id"], options)
     drivy = Drivy(driver.get_total_no_options(),
-                  driver.get_rental_days(), options)
+                  driver.rental_days, options)
     car_owner = CarOwner(driver.get_total_no_options(),
-                         driver.get_rental_days(), options)
-    data["rentals"].append({
+                         driver.rental_days, options)
+    result["rentals"].append({
         "id": driver.id,
         "options": options,
         "actions": [driver.get_actions(), car_owner.get_actions(), *drivy.get_actions()]
     })
 
 with open('data/output.json', 'w') as out:
-    json.dump(data, out, indent=2)
+    json.dump(result, out, indent=2)

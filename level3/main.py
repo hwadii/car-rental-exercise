@@ -1,8 +1,7 @@
 import json
 from datetime import datetime
 
-# changer ça
-with open('/home/hwadii/code/python/jobs/backend/level2/data/input.json') as f:
+with open('data/input.json') as f:
     read_data = json.load(f)
 
 
@@ -11,11 +10,6 @@ class Car:
         self.id = id
         self.price_per_day = price_per_day
         self.price_per_km = price_per_km
-
-
-class CarOwner:
-    def __init__(self, car):
-        self.car = car
 
 
 class Drivy:
@@ -44,13 +38,11 @@ class Driver:
             read_data["rentals"][id - 1]["start_date"], "%Y-%m-%d")
         self.end_date = datetime.strptime(
             read_data["rentals"][id - 1]["end_date"], "%Y-%m-%d")
+        self.rental_days = (self.end_date - self.start_date).days + 1
         self.distance = read_data["rentals"][id - 1]["distance"]
 
-    def get_rental_days(self):
-        return (self.end_date - self.start_date).days + 1
-
     def get_time_component(self):
-        rental_days = self.get_rental_days()
+        rental_days = self.rental_days
         decreasing_price = 0
         while rental_days > 0:
             if rental_days > 10:
@@ -74,12 +66,12 @@ class Driver:
         return self.get_distance_component() + self.get_time_component()
 
 
-data = {}
-data["rentals"] = []
-for d in read_data["rentals"]:
-    driver = Driver(d["id"])
-    drivy = Drivy(driver.get_total(), driver.get_rental_days())
-    data["rentals"].append({
+result = {}
+result["rentals"] = []
+for data in read_data["rentals"]:
+    driver = Driver(data["id"])
+    drivy = Drivy(driver.get_total(), driver.rental_days)
+    result["rentals"].append({
         "id": driver.id,
         "price": drivy.total,
         "commission": {
@@ -90,4 +82,4 @@ for d in read_data["rentals"]:
     })
 
 with open('data/output.json', 'w') as out:
-    json.dump(data, out)
+    json.dump(result, out, indent=2)

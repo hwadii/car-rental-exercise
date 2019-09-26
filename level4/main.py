@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-# changer ça
 with open('data/input.json') as f:
     read_data = json.load(f)
 
@@ -14,8 +13,7 @@ class Car:
 
 
 class CarOwner:
-    def __init__(self, car_id, total):
-        self.car_id = car_id
+    def __init__(self, total):
         self.commission = total * (70 / 100)
 
     def get_action(self):
@@ -24,6 +22,7 @@ class CarOwner:
             "type": "credit",
             "amount": self.commission
         }
+
 
 class Drivy:
     def __init__(self, total, days):
@@ -53,7 +52,7 @@ class Drivy:
         }
 
     def get_actions(self):
-        return [self.get_assistance_fee(), self.get_drivy_fee(), self.get_insurance_fee()]
+        return [self.get_insurance_fee(), self.get_assistance_fee(), self.get_drivy_fee()]
 
 
 class Driver:
@@ -66,13 +65,11 @@ class Driver:
             read_data["rentals"][id - 1]["start_date"], "%Y-%m-%d")
         self.end_date = datetime.strptime(
             read_data["rentals"][id - 1]["end_date"], "%Y-%m-%d")
+        self.rental_days = (self.end_date - self.start_date).days + 1
         self.distance = read_data["rentals"][id - 1]["distance"]
 
-    def get_rental_days(self):
-        return (self.end_date - self.start_date).days + 1
-
     def get_time_component(self):
-        rental_days = self.get_rental_days()
+        rental_days = self.rental_days
         decreasing_price = 0
         while rental_days > 0:
             if rental_days > 10:
@@ -103,16 +100,16 @@ class Driver:
         }
 
 
-data = {}
-data["rentals"] = []
-for d in read_data["rentals"]:
-    driver = Driver(d["id"])
-    drivy = Drivy(driver.get_total(), driver.get_rental_days())
-    carOwner = CarOwner(d["id"], driver.get_total())
-    data["rentals"].append({
+result = {}
+result["rentals"] = []
+for data in read_data["rentals"]:
+    driver = Driver(data["id"])
+    drivy = Drivy(driver.get_total(), driver.rental_days)
+    car_owner = CarOwner(driver.get_total())
+    result["rentals"].append({
         "id": driver.id,
-        "actions": [driver.get_action(), carOwner.get_action(), *drivy.get_actions()]
+        "actions": [driver.get_action(), car_owner.get_action(), *drivy.get_actions()]
     })
 
 with open('data/output.json', 'w') as out:
-    json.dump(data, out)
+    json.dump(result, out, indent=2)
