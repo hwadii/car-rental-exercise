@@ -1,4 +1,4 @@
-# Car rental exercises
+# Car rental exercise
 
 ## Description
 
